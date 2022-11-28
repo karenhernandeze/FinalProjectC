@@ -53,7 +53,7 @@ void upload_reference(int sockfd)
 	free(buffer);
 	for (int x = 0; x < i; x++)
 	{
-		// printf("%s\n\n\n", buffer[x]);
+		// printf("%s", buffer[x]);
 		send(sockfd, buffer[x], strlen(buffer[x]), 0);
 	}
 
@@ -63,59 +63,34 @@ void upload_reference(int sockfd)
 	close(sockfd);
 }
 
-int upload_referenc()
-{
-	int file;
-	struct stat s;
-	int status;
-	size_t size;
-	const char *fileName = "reference.log";
-	const char *reference;
-	int i;
-
-	file = open(fileName, O_RDONLY);
-	status = fstat(file, &s);
-	size = s.st_size;
-
-	reference = mmap(0, size, PROT_READ, MAP_PRIVATE, file, 0);
-
-	for (i = 0; i < size; i++)
-    {
-        char c;
-        c = reference[i];
-        putchar(c);
-    }
-}
-
 int main()
 {
-	// int sockfd, connfd;
-	// struct sockaddr_in servaddr, cli;
+	int sockfd, connfd;
+	struct sockaddr_in servaddr, cli;
 
-	// sockfd = socket(AF_INET, SOCK_STREAM, 0);
-	// if (sockfd == -1)
-	// {
-	// 	printf("socket creation failed...\n");
-	// 	exit(0);
-	// }
-	// else
-	// 	printf("Socket successfully created..\n");
-	// bzero(&servaddr, sizeof(servaddr));
+	sockfd = socket(AF_INET, SOCK_STREAM, 0);
+	if (sockfd == -1)
+	{
+		printf("socket creation failed...\n");
+		exit(0);
+	}
+	else
+		printf("Socket successfully created..\n");
+	bzero(&servaddr, sizeof(servaddr));
 
-	// servaddr.sin_family = AF_INET;
-	// servaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
-	// servaddr.sin_port = htons(PORT);
+	servaddr.sin_family = AF_INET;
+	servaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+	servaddr.sin_port = htons(PORT);
 
-	// if (connect(sockfd, (SA *)&servaddr, sizeof(servaddr)) != 0)
-	// {
-	// 	printf("connection with the server failed...\n");
-	// 	exit(0);
-	// }
-	// else
-	// 	printf("connected to the server..\n");
+	if (connect(sockfd, (SA *)&servaddr, sizeof(servaddr)) != 0)
+	{
+		printf("connection with the server failed...\n");
+		exit(0);
+	}
+	else
+		printf("connected to the server..\n");
 
-	upload_referenc();
-	// upload_sequence(sockfd);
+	upload_reference(sockfd);
 
-	// close(sockfd);
+	close(sockfd);
 }
