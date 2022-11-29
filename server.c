@@ -68,6 +68,35 @@ void reference(int connfd)
 	send(connfd, hello, strlen(hello), 0);
 }
 
+void sequence(int connfd)
+{
+	char buffer[1024] = {0};
+	int valread;
+	char **referenceValue;
+	char line[128];
+	int num = 90663;
+	
+	// referenceValue = (char **)malloc(num * sizeof(char *));
+	// for (int m = 0; m < num; m++)
+	// 	referenceValue[m] = (char *)malloc(sizeof(line) * sizeof(char));
+
+	// for (int x = 0; x < num; x++)
+	// {
+		valread = read(connfd, buffer, 8205);
+		// strcpy(referenceValue[x], &buffer);
+		printf("%c", &buffer);
+	// }
+
+	// GET VALUES FROM MEMORY
+	// for (int x = 0; x < num; x++)
+	// {
+	// 	fprintf(fptr, "%s", referenceValue[x]);
+	// }
+	
+	char *hello = "Hello from server";
+	send(connfd, hello, strlen(hello), 0);
+}
+
 int main()
 {
 	int sockfd, connfd, len;
@@ -113,8 +142,9 @@ int main()
 	else
 		printf("server accept the client...\n");
 
-	reference(connfd);
-	printf("PRUTN VALUES> %s", referenceData);
+	// reference(connfd);
+	// printf("PRUTN VALUES> %s", referenceData);
+	sequence(connfd);
 
 	close(sockfd);
 }
