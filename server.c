@@ -16,6 +16,23 @@
 
 const char *referenceData;
 
+size_t strlenNoSpaces(const char *restrict c)
+{
+	size_t length = 0;
+	for (; *c; c++)
+	{
+		if (*c != '\n')
+		{
+			length++;
+		}
+		else
+		{
+			return length;
+		}
+	}
+	return length;
+}
+
 void getData()
 {
 	int file;
@@ -29,7 +46,6 @@ void getData()
 	size = s.st_size;
 
 	referenceData = mmap(0, size, PROT_READ, MAP_PRIVATE, file, 0);
-
 }
 
 void reference(int connfd)
@@ -43,7 +59,7 @@ void reference(int connfd)
 	char **referenceValue;
 	char line[128];
 	int num = 90663;
-	
+
 	referenceValue = (char **)malloc(num * sizeof(char *));
 	for (int m = 0; m < num; m++)
 		referenceValue[m] = (char *)malloc(sizeof(line) * sizeof(char));
@@ -63,36 +79,58 @@ void reference(int connfd)
 	fclose(fptr);
 
 	getData();
-	
+
 	char *hello = "Hello from server";
 	send(connfd, hello, strlen(hello), 0);
 }
 
 void sequence(int connfd)
 {
-	char buffer[1024] = {0};
+	char buffer[128] = {0};
 	int valread;
 	char **referenceValue;
 	char line[128];
-	int num = 90663;
-	
-	// referenceValue = (char **)malloc(num * sizeof(char *));
-	// for (int m = 0; m < num; m++)
-	// 	referenceValue[m] = (char *)malloc(sizeof(line) * sizeof(char));
+	int num = 109691;
 
-	// for (int x = 0; x < num; x++)
-	// {
-		valread = read(connfd, buffer, 8205);
+	referenceValue = (char **)malloc(num * sizeof(char *));
+	for (int m = 0; m < num; m++)
+		referenceValue[m] = (char *)malloc(sizeof(line) * sizeof(char));
+
+	for (int x = 0; x < num; x++)
+	{
+		valread = read(connfd, buffer, 127);
+		printf("%s", &buffer);
+		// printf("ORIGINAL: %s", &buffer);
+		// if (strchr(buffer, '\n') != NULL)
+		// {
+		// 	// printf("\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n");
+		// 	char test[128];
+		// 	size_t size;
+		// 	size = strlenNoSpaces(&buffer);
+		// 	// memset(referenceValue[x], '\n', sizeof(test));
+		// 	// strncpy(referenceValue[x], &buffer, size);
+		// 	for (int i = 0; i < 128; i++)
+		// 	{
+		// 		test[i] = '-';
+		// 	}
+		// 	// strcpy(referenceValue[x], &buffer);
+		// 	strcpy(referenceValue[x], test);
+		// 	x++;
+		// }
+		// else
+		// {
+		// 	strcpy(referenceValue[x], &buffer);
+		// }
 		// strcpy(referenceValue[x], &buffer);
-		printf("%c", &buffer);
-	// }
+	}
 
 	// GET VALUES FROM MEMORY
-	// for (int x = 0; x < num; x++)
-	// {
-	// 	fprintf(fptr, "%s", referenceValue[x]);
-	// }
-	
+	for (int x = 0; x < num; x++)
+	{
+		printf("%s", referenceValue[x]);
+	}
+	free(referenceValue);
+
 	char *hello = "Hello from server";
 	send(connfd, hello, strlen(hello), 0);
 }
