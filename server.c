@@ -90,7 +90,7 @@ void sequence(int connfd)
 	int valread;
 	char **referenceValue;
 	char line[128];
-	int num = 109691;
+	int num = 109189;
 
 	referenceValue = (char **)malloc(num * sizeof(char *));
 	for (int m = 0; m < num; m++)
