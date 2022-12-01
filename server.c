@@ -17,7 +17,7 @@
 #define SA struct sockaddr
 struct _ThreadArgs
 {
-    int tid;
+	int tid;
 };
 
 const char *referenceData;
@@ -56,7 +56,6 @@ void getData()
 
 void reference(int connfd)
 {
-
 	// File handaling
 	FILE *fptr;
 	fptr = fopen("dataReference.log", "a");
@@ -89,7 +88,6 @@ void reference(int connfd)
 
 	char *hello = "Hello from server";
 	send(connfd, hello, strlen(hello), 0);
-
 }
 
 void sequence(int connfd)
@@ -101,7 +99,7 @@ void sequence(int connfd)
 	int num = 109189;
 	FILE *fptr;
 	fptr = fopen("dataSequence.log", "a");
-	
+
 	referenceValue = (char **)malloc(num * sizeof(char *));
 	for (int m = 0; m < num; m++)
 		referenceValue[m] = (char *)malloc(sizeof(line) * sizeof(char));
@@ -109,7 +107,7 @@ void sequence(int connfd)
 	for (int x = 0; x < num; x++)
 	{
 		valread = read(connfd, buffer, 127);
-		printf("%s", &buffer);
+		// printf("%s", &buffer);
 		fprintf(fptr, "%s", &buffer);
 		// 	size_t size;
 		// 	size = strlenNoSpaces(&buffer);
@@ -122,10 +120,65 @@ void sequence(int connfd)
 	send(connfd, hello, strlen(hello), 0);
 }
 
-manager(int socket){
+void manager(int socket)
+{
 	reference(socket);
-	// printf("REFERENCE VALUES: %s", referenceData);
 	sequence(socket);
+}
+
+void validation()
+{
+	FILE *fptr;
+	fptr = fopen("dataSequence.log", "r");
+	char *seq[1000] = {
+		"roadrash",
+		"nfs",
+		"angrybirds"};
+
+	// seq[0] = "hitman";
+	// FILE *file;
+	// char *code = malloc(1000 * sizeof(char));
+	// // file = fopen(fileName, "r");
+	// do
+	// {
+	// 	*code++ = (char)fgetc(fptr);
+	// 	strcpy(seq[0], &code);
+
+	// } while (*code != '\n');
+	// printf("%s", &code);
+	int c, counter = 0;
+
+	// while ((c = fgetc(fptr)) != '\n')
+	// {
+	// 	// test[counter] = c;
+	// 	counter++;
+	// }
+	
+	// rewind(fptr);
+	// char test[counter]; 
+	// for (int i = 0; i < counter; i++)
+	// {
+	// 	c = fgetc(fptr);
+	// 	test[i] = c;
+
+	// 	printf("%c", c);
+	// }
+		
+	// if (ferror(fptr))
+	// 	printf("Read Error\n"), exit(EXIT_FAILURE);
+
+	// for (int i = 0; i < counter; i++)
+	// {
+	// 	printf("%c", test[i]);
+	// }
+	char str1[999999];
+		// printf("%s", test);
+	fscanf(fptr, "%s", str1);
+
+	if (strstr(referenceData, str1) != NULL){
+		printf("STRING EXISTS IN REFERENCE");
+	}
+	fclose(fptr);
 }
 
 int main()
@@ -173,34 +226,8 @@ int main()
 	else
 		printf("server accept the client...\n");
 
-
-
-
-
-
-
-
-	// pthread_t threads[NTHREADS];
-    // struct _ThreadArgs thread_args[NTHREADS];
-    // int rc, i, rc2;
-    // /* spawn the threads */
-    // for (i = 0; i < NTHREADS; ++i)
-    // {
-    //     // int sleepTime = rand() % 10;
-    //     thread_args[i].tid = i;
-    //     // thread_args[i].sleepTime = sleepTime;
-    //     printf("spawning thread %d\n", i);
-    //     rc = pthread_create(&threads[i], NULL, sequence(connfd), (void *)&thread_args[i]);
-    //     rc2 = pthread_create(&threads[i], NULL, reference(connfd), (void *)&thread_args[i]);
-    // }
-    // /* wait for threads to finish */
-    // for (i = 0; i < NTHREADS; ++i)
-    // {
-    //     rc = pthread_join(threads[i], NULL);
-    //     rc2 = pthread_join(threads[i], NULL);
-    // }
-	
 	manager(connfd);
+	validation();
 
 	close(sockfd);
 }
