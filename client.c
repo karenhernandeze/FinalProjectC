@@ -27,32 +27,10 @@ void upload_sequence(int sockfd)
 	for (int m = 0; m < num; m++)
 		buffer[m] = (char *)malloc(sizeof(line) * sizeof(char));
 
-	printf("NU< %d", num);
 	while (fgets(line, sizeof(line), fptr))
 	{
-		// if (strchr(line, '\n') != NULL)
-		// {
-		// 	// printf("LOOP ENTERS HERE!!! \n");
-		// 	// size_t prevlen = sizeof(line);
-		// 	// memset(buffer[i] + prevlen, '-', 127 - prevlen);
-		// 	// *(line + 127) = '\n';
-			// for (int i=0; i<128; i++){
-			// 	line[i] = '-';
-			// }
-		// 	strcpy(buffer[i], line);
-		// 	i++;
-			
-
-	// char tval[20] = "temp:26.62          ";
-	// 	size_t prevlen = strlen(tval);
-	// memset(tval + prevlen, ' ', 19 - prevlen);
-	// *(tval + 19) = '\0';
-		// }
-		// else
-		// {
-			strcpy(buffer[i], line);
-			i++;
-		// }
+		strcpy(buffer[i], line);
+		i++;
 	}
 
 	free(buffer);
@@ -62,10 +40,10 @@ void upload_sequence(int sockfd)
 		send(sockfd, buffer[x], strlen(buffer[x]), 0);
 	}
 
-	valread = read(sockfd, buff, 1024);
-	printf("%s\n", buff);
+	// valread = read(sockfd, buff, 1024);
+	// printf("%s\n", buff);
 	fclose(fptr);
-	close(sockfd);
+	// close(sockfd);
 }
 
 void upload_reference(int sockfd)
@@ -96,11 +74,18 @@ void upload_reference(int sockfd)
 		// printf("%s", buffer[x]);
 		send(sockfd, buffer[x], strlen(buffer[x]), 0);
 	}
-
+	
+	// upload_sequence(sockfd);
 	valread = read(sockfd, buff, 1024);
 	printf("%s\n", buff);
 	fclose(fptr);
-	close(sockfd);
+	// close(sockfd);
+}
+
+void manager(int socket){
+
+	upload_reference(socket);
+	upload_sequence(socket);
 }
 
 int main()
@@ -130,9 +115,7 @@ int main()
 	else
 		printf("connected to the server..\n");
 
-	// upload_reference(sockfd);
-	// upload_seq(sockfd);
-	upload_sequence(sockfd);
+	manager(sockfd);
 
 	close(sockfd);
 }

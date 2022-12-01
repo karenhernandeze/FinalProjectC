@@ -10,9 +10,15 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <pthread.h>
+#define NTHREADS 5
 #define MAX 80
 #define PORT 8080
 #define SA struct sockaddr
+struct _ThreadArgs
+{
+    int tid;
+};
 
 const char *referenceData;
 
@@ -39,7 +45,7 @@ void getData()
 	struct stat s;
 	int status;
 	size_t size;
-	const char *fileName = "data.txt";
+	const char *fileName = "dataReference.log";
 
 	file = open(fileName, O_RDONLY);
 	status = fstat(file, &s);
@@ -50,9 +56,10 @@ void getData()
 
 void reference(int connfd)
 {
+
 	// File handaling
 	FILE *fptr;
-	fptr = fopen("data.txt", "a");
+	fptr = fopen("dataReference.log", "a");
 
 	char buffer[1024] = {0};
 	int valread;
@@ -82,6 +89,7 @@ void reference(int connfd)
 
 	char *hello = "Hello from server";
 	send(connfd, hello, strlen(hello), 0);
+
 }
 
 void sequence(int connfd)
@@ -91,7 +99,9 @@ void sequence(int connfd)
 	char **referenceValue;
 	char line[128];
 	int num = 109189;
-
+	FILE *fptr;
+	fptr = fopen("dataSequence.log", "a");
+	
 	referenceValue = (char **)malloc(num * sizeof(char *));
 	for (int m = 0; m < num; m++)
 		referenceValue[m] = (char *)malloc(sizeof(line) * sizeof(char));
@@ -100,39 +110,22 @@ void sequence(int connfd)
 	{
 		valread = read(connfd, buffer, 127);
 		printf("%s", &buffer);
-		// printf("ORIGINAL: %s", &buffer);
-		// if (strchr(buffer, '\n') != NULL)
-		// {
-		// 	// printf("\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n");
-		// 	char test[128];
+		fprintf(fptr, "%s", &buffer);
 		// 	size_t size;
 		// 	size = strlenNoSpaces(&buffer);
-		// 	// memset(referenceValue[x], '\n', sizeof(test));
-		// 	// strncpy(referenceValue[x], &buffer, size);
-		// 	for (int i = 0; i < 128; i++)
-		// 	{
-		// 		test[i] = '-';
-		// 	}
-		// 	// strcpy(referenceValue[x], &buffer);
-		// 	strcpy(referenceValue[x], test);
-		// 	x++;
-		// }
-		// else
-		// {
-		// 	strcpy(referenceValue[x], &buffer);
-		// }
 		// strcpy(referenceValue[x], &buffer);
 	}
-
-	// GET VALUES FROM MEMORY
-	for (int x = 0; x < num; x++)
-	{
-		printf("%s", referenceValue[x]);
-	}
+	fclose(fptr);
 	free(referenceValue);
 
 	char *hello = "Hello from server";
 	send(connfd, hello, strlen(hello), 0);
+}
+
+manager(int socket){
+	reference(socket);
+	// printf("REFERENCE VALUES: %s", referenceData);
+	sequence(socket);
 }
 
 int main()
@@ -180,9 +173,34 @@ int main()
 	else
 		printf("server accept the client...\n");
 
-	// reference(connfd);
-	// printf("PRUTN VALUES> %s", referenceData);
-	sequence(connfd);
+
+
+
+
+
+
+
+	// pthread_t threads[NTHREADS];
+    // struct _ThreadArgs thread_args[NTHREADS];
+    // int rc, i, rc2;
+    // /* spawn the threads */
+    // for (i = 0; i < NTHREADS; ++i)
+    // {
+    //     // int sleepTime = rand() % 10;
+    //     thread_args[i].tid = i;
+    //     // thread_args[i].sleepTime = sleepTime;
+    //     printf("spawning thread %d\n", i);
+    //     rc = pthread_create(&threads[i], NULL, sequence(connfd), (void *)&thread_args[i]);
+    //     rc2 = pthread_create(&threads[i], NULL, reference(connfd), (void *)&thread_args[i]);
+    // }
+    // /* wait for threads to finish */
+    // for (i = 0; i < NTHREADS; ++i)
+    // {
+    //     rc = pthread_join(threads[i], NULL);
+    //     rc2 = pthread_join(threads[i], NULL);
+    // }
+	
+	manager(connfd);
 
 	close(sockfd);
 }
