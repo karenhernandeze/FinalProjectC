@@ -35,7 +35,7 @@ void getData()
 	size = s.st_size;
 
 	referenceData = mmap(0, size, PROT_READ, MAP_PRIVATE, file, 0);
-	
+
 	if (remove("dataReference.log") != 0)
 	{
 		printf("Error deleting file.");
@@ -52,10 +52,15 @@ void validation()
 	{
 		char sequence[999999];
 		fscanf(fptr, "%s", sequence);
+		int length = strlen(sequence);
+		// printf("Value of N: %d", length);
 		counter++;
-		if (strstr(referenceData, sequence))
+		char *result = strstr(referenceData, sequence);
+
+		if (result)
 		{
-			printf("%d Sequence Found.\n", counter);
+			int position = result - referenceData;
+			printf("%d Sequence Found From Index: %d to Index: %d.\n", counter, position, (position + length));
 		}
 		else
 		{
@@ -65,7 +70,6 @@ void validation()
 		{
 			break;
 		}
-		// printf("Iterations of Sequences: %d", counter);
 
 	} while (!feof(fptr));
 	printf("Iterations of Sequences: %d", counter);
